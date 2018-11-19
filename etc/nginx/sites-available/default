@@ -1,0 +1,40 @@
+server {
+        listen 80 default_server;
+        listen [::]:80 default_server;
+
+        # SSL configuration
+        
+        listen 443 ssl default_server;
+        listen [::]:443 ssl default_server;
+
+	# edit: server ip
+	server_name 12.34.56.78;
+
+	ssl_certificate /etc/ssl/certs/nginx-selfsigned.crt;
+	ssl_certificate_key /etc/ssl/private/nginx-selfsigned.key;
+        
+        root /var/www/html;
+
+        index index.html index.htm index.nginx-debian.html;
+
+        location / {
+                # First attempt to serve request as file, then
+                # as directory, then fall back to displaying a 404.
+                try_files $uri $uri/ =404;
+        }
+
+	location /files {
+		alias /www/files;
+		autoindex on;
+	}
+
+	location /gpumon {
+		include uwsgi_params;
+		uwsgi_pass unix:/www/gpumon.sock;
+	}
+
+	location /gpumon/static {
+		alias /www/gpumon/static;
+	}
+}
+
